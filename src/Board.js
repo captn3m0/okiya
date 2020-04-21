@@ -22,7 +22,7 @@ class Board extends React.Component {
     if (this.props.ctx.gameover) {
       winner =
         this.props.ctx.gameover.winner !== undefined ? (
-          <div id="winner">Winner: {this.props.ctx.gameover.winner}</div>
+          <div id="winner">Winner: {this.props.ctx.gameover.winner === "0" ? "Red" : "Black"}</div>
         ) : (
           <div id="winner">Draw!</div>
         );

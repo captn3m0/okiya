@@ -2,6 +2,8 @@
 
 This is an implementation of Okiya, using boardgame.io.
 
+See <http://www.blueorangegames.eu/pf/okiya/>
+
 ## How to run?
 
 ```

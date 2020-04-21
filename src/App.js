@@ -1,3 +1,5 @@
+import { INVALID_MOVE } from 'boardgame.io/core';
+
 // Return true if `cells` is in a winning configuration.
 function IsVictory(cells) {
   const positions = [
@@ -34,11 +36,6 @@ function IsVictory(cells) {
 
   return positions.map(isRowComplete).some((i) => i === true);
 }
-
-// Return true if all `cells` are occupied.
-// function IsDraw(cells) {
-//   return cells.filter((c) => c === null).length === 0;
-// }
 
 const UnshuffledDeck = [
   "A1",
@@ -78,17 +75,17 @@ const Okiya = {
   turn: {
     moveLimit: 1,
   },
-  // ai: {
-  //   enumerate: (G, ctx) => {
-  //     let moves = [];
-  //     for (let i = 0; i < 16; i++) {
-  //       if (G.cells[i] === null) {
-  //         moves.push({ move: "clickCell", args: [i] });
-  //       }
-  //     }
-  //     return moves;
-  //   },
-  // },
+  ai: {
+    enumerate: (G, ctx) => {
+      let moves = [];
+      for (let i = 0; i < 16; i++) {
+        if (unclaimed(G.cells[i]) && validMove(G.cells[i], i, G.lastPlayed)) {
+          moves.push({ move: "clickCell", args: [i] });
+        }
+      }
+      return moves;
+    },
+  },
   setup: (ctx) => ({
     cells: ctx.random.Shuffle(UnshuffledDeck),
     lastPlayed: null,
@@ -101,7 +98,7 @@ const Okiya = {
         G.cells[id] = parseInt(ctx.currentPlayer, 10);
       }
       else {
-        return undefined
+        return INVALID_MOVE;
       }
     },
   },
