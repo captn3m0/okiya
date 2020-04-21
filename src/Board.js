@@ -22,7 +22,9 @@ class Board extends React.Component {
     if (this.props.ctx.gameover) {
       winner =
         this.props.ctx.gameover.winner !== undefined ? (
-          <div id="winner">Winner: {this.props.ctx.gameover.winner === "0" ? "Red" : "Black"}</div>
+          <div id="winner">Winner: {this.props.ctx.gameover.winner === "0" ? "Red" : "Black"}
+          {this.props.ctx.gameover.stalemate !== undefined ? <span> by stalemate</span> : "" }
+          </div>
         ) : (
           <div id="winner">Draw!</div>
         );
@@ -31,7 +33,7 @@ class Board extends React.Component {
     if (this.props.G.lastPlayed) {
       lastPlayed = <div>
         <p>Last Played Tile: </p>
-        <table>
+        <table class="board">
         <tr>
           {Tile(this.props.G.lastPlayed)}
         </tr>
@@ -72,7 +74,7 @@ class Board extends React.Component {
 
     return (
       <div>
-        <table id="board">
+        <table class="board">
           <tbody>{tbody}</tbody>
         </table>
         {winner}

@@ -1,4 +1,4 @@
-#board {
+.board {
 	border-collapse: collapse;
 }
 
@@ -8,7 +8,7 @@
 	text-align: center;
 }
 
-td {
+.board td {
 	border: 3px solid #dff9fb;
 	width: 100px;
 	height: 100px;
@@ -21,35 +21,35 @@ td {
 	line-height: 50px;
 }
 
-td.active {
+.board td.active {
 	cursor: pointer;
 }
 
-td.active:hover {
+.board td.active:hover {
 	background: #7ed6df;
 }
 
-td[data-tile="0"] {
+.board td[data-tile="0"] {
 	border-radius: 50%;
 	border: 3px solid white;
 	background-color: #eb4d4b !important;
 }
-td[data-tile="1"] {
+.board td[data-tile="1"] {
 	border: 3px solid white;
 	border-radius: 50%;
 	background-color: #130f40 !important;
 }
 
-td[data-tile^="A"] {
+.board td[data-tile^="A"] {
 	background-color: #f9ca24;
 }
 
-td[data-tile^="B"] {
+.board td[data-tile^="B"] {
 	background-color: #686de0;
 }
-td[data-tile^="C"] {
+.board td[data-tile^="C"] {
 	background-color: #6ab04c;
 }
-td[data-tile^="D"] {
+.board td[data-tile^="D"] {
 	background-color: #e056fd;
 }

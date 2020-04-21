@@ -69,7 +69,7 @@ function validMove(cell, id, tile) {
 }
 
 function unclaimed(tile) {
-  return !(tile==="0"||tile==="1");
+  return !(tile===0||tile===1);
 }
 const Okiya = {
   turn: {
@@ -107,9 +107,19 @@ const Okiya = {
     if (IsVictory(G.cells)) {
       return { winner: ctx.currentPlayer };
     }
-    // if (IsDraw(G.cells)) {
-    //   return { draw: true };
-    // }
+
+    if(G.cells.filter(unclaimed).length === 0) {
+      return {draw: true}
+    }
+
+    let numMoves = Okiya.ai.enumerate(G, ctx).length;
+
+    if (numMoves === 0) {
+      return {
+        winner: ctx.currentPlayer,
+        stalemate: true
+      }
+    }
   },
 };
 
