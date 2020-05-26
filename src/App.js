@@ -1,4 +1,4 @@
-import { INVALID_MOVE } from 'boardgame.io/core';
+import { INVALID_MOVE } from "boardgame.io/core";
 
 // Return true if `cells` is in a winning configuration.
 function IsVictory(cells) {
@@ -57,19 +57,17 @@ const UnshuffledDeck = [
 ];
 
 function validMove(cell, id, tile) {
-  const borders = [
-    0,1,2,3,4,7,8,11,12,13,14,15
-  ];
+  const borders = [0, 1, 2, 3, 4, 7, 8, 11, 12, 13, 14, 15];
   // If first move, only allow borders
   if (tile === null) {
-    return borders.includes(id)
+    return borders.includes(id);
   }
   // else match against the last played tile
-  return (cell[0] === tile[0] || cell[1] === tile[1]);
+  return cell[0] === tile[0] || cell[1] === tile[1];
 }
 
 function unclaimed(tile) {
-  return !(tile===0||tile===1);
+  return !(tile === 0 || tile === 1);
 }
 const Okiya = {
   turn: {
@@ -96,8 +94,7 @@ const Okiya = {
       if (unclaimed(G.cells[id]) && validMove(G.cells[id], id, G.lastPlayed)) {
         G.lastPlayed = G.cells[id];
         G.cells[id] = parseInt(ctx.currentPlayer, 10);
-      }
-      else {
+      } else {
         return INVALID_MOVE;
       }
     },
@@ -108,8 +105,8 @@ const Okiya = {
       return { winner: ctx.currentPlayer };
     }
 
-    if(G.cells.filter(unclaimed).length === 0) {
-      return {draw: true}
+    if (G.cells.filter(unclaimed).length === 0) {
+      return { draw: true };
     }
 
     let numMoves = Okiya.ai.enumerate(G, ctx).length;
@@ -117,8 +114,8 @@ const Okiya = {
     if (numMoves === 0) {
       return {
         winner: ctx.currentPlayer,
-        stalemate: true
-      }
+        stalemate: true,
+      };
     }
   },
 };
