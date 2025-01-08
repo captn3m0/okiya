@@ -1,35 +1,25 @@
 {
-  "name": "bgio-okiya",
-  "version": "0.1.0",
+  "name": "okiya",
+  "version": "0.5.0",
+  "description": "This is an implementation of Okiya, using boardgame.io.",
+  "homepage": "https://github.com/captn3m0/okiya#readme",
+  "bugs": {
+    "url": "https://github.com/captn3m0/okiya/issues"
+  },
   "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "boardgame.io": "^0.39.7",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/captn3m0/okiya.git"
   },
+  "license": "MIT",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "parcel index.html --open"
   },
-  "eslintConfig": {
-    "extends": "react-app"
+  "dependencies": {
+    "boardgame.io": "^0.50.2"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "devDependencies": {
+    "parcel-bundler": "^1.12.5"
+  },
+  "browserslist": "defaults and supports async-functions"
 }
