@@ -1,123 +1,83 @@
-import { INVALID_MOVE } from "boardgame.io/core";
+import { Client } from 'boardgame.io/client';
+import { Okiya } from './Game';
 
-// Return true if `cells` is in a winning configuration.
-function IsVictory(cells) {
-  const positions = [
-    // Rows
-    [0, 1, 2, 3],
-    [4, 5, 6, 7],
-    [8, 9, 10, 11],
-    [12, 13, 14, 15],
-
-    // Columns
-    [0, 4, 8, 12],
-    [1, 5, 9, 13],
-    [2, 6, 10, 14],
-    [3, 7, 11, 15],
-
-    // Squares
-    [0, 1, 4, 5],
-    [1, 2, 5, 6],
-    [2, 3, 6, 7],
-
-    [4, 5, 8, 9],
-    [5, 6, 9, 10],
-    [6, 7, 10, 11],
-
-    [8, 9, 12, 13],
-    [9, 10, 13, 14],
-    [10, 11, 14, 15],
-  ];
-
-  const isRowComplete = (row) => {
-    const symbols = row.map((i) => cells[i]);
-    return symbols.every((i) => i !== null && i === symbols[0]);
-  };
-
-  return positions.map(isRowComplete).some((i) => i === true);
-}
-
-const UnshuffledDeck = [
-  "A1",
-  "A2",
-  "A3",
-  "A4",
-  "B1",
-  "B2",
-  "B3",
-  "B4",
-  "C1",
-  "C2",
-  "C3",
-  "C4",
-  "D1",
-  "D2",
-  "D3",
-  "D4",
-];
-
-function validMove(cell, id, tile) {
-  const borders = [0, 1, 2, 3, 4, 7, 8, 11, 12, 13, 14, 15];
-  // If first move, only allow borders
-  if (tile === null) {
-    return borders.includes(id);
+function Tile(val, id=null, ctx=null) {
+  const suitLookup = function(val) {
+    const SUITS = ['♠','♥','♦','♣'];
+    let index = parseInt(val[1], 10) - 1;
+    return SUITS[index];
   }
-  // else match against the last played tile
-  return cell[0] === tile[0] || cell[1] === tile[1];
+  let text = (val ===0 || val ===1)? "" : suitLookup(val);
+
+  return `<td class=cell data-tile=${val} data-suit=${val[1]} key=${id} >${text}</td>`
 }
 
-function unclaimed(tile) {
-  return !(tile === 0 || tile === 1);
+
+class OkiyaClient {
+  constructor(rootElement) {
+    this.client = Client({ game: Okiya });
+    this.client.start();
+    this.rootElement = rootElement;
+    this.client.subscribe(state => this.update(state));
+    this.createBoard();
+    this.attachListeners();
+  }
+
+
+  createBoard() {
+    this.rootElement.innerHTML = `
+      <table id=board></table>
+      <p class="winner"></p>
+      <div class="lastplayed"></div>`;
+  }
+
+  update(state) {
+
+    let tbody = [];
+    for (let i = 0; i < 4; i++) {
+      let cells = [];
+      for (let j = 0; j < 4; j++) {
+        const id = 4 * i + j;
+        cells.push(Tile(state.G.cells[id], id, this));
+      }
+      tbody.push(`<tr key=${i}>${cells}</tr>`);
+    }
+
+    let lastPlayed = "";
+
+    if (state.G.lastPlayed)
+      lastPlayed = `<div>
+        <p>Last Played Tile: </p>
+        <table class="board">
+        <tr>
+          ${Tile(state.G.lastPlayed)}
+        </tr>
+        </table>
+        </div>`;
+
+    this.rootElement.innerHTML = `
+      <table class=board>${tbody.join("\n")}</table>
+      <p class="winner"></p>
+      ${lastPlayed}`;
+    
+  }
+
+
+  attachListeners() {
+    // This event handler will read the cell id from a cell’s
+    // `data-id` attribute and make the `clickCell` move.
+    const handleCellClick = event => {
+      const id = parseInt(event.target.dataset.id);
+      this.client.moves.clickCell(id);
+    };
+    // Attach the event listener to each of the board cells.
+    const cells = this.rootElement.querySelectorAll('.cell');
+    cells.forEach(cell => {
+      cell.onclick = handleCellClick;
+    });
+  }
 }
-const Okiya = {
-  turn: {
-    moveLimit: 1,
-  },
-  ai: {
-    enumerate: (G, ctx) => {
-      let moves = [];
-      for (let i = 0; i < 16; i++) {
-        if (unclaimed(G.cells[i]) && validMove(G.cells[i], i, G.lastPlayed)) {
-          moves.push({ move: "clickCell", args: [i] });
-        }
-      }
-      return moves;
-    },
-  },
-  setup: (ctx) => ({
-    cells: ctx.random.Shuffle(UnshuffledDeck),
-    lastPlayed: null,
-  }),
 
-  moves: {
-    clickCell: (G, ctx, id) => {
-      if (unclaimed(G.cells[id]) && validMove(G.cells[id], id, G.lastPlayed)) {
-        G.lastPlayed = G.cells[id];
-        G.cells[id] = parseInt(ctx.currentPlayer, 10);
-      } else {
-        return INVALID_MOVE;
-      }
-    },
-  },
 
-  endIf: (G, ctx) => {
-    if (IsVictory(G.cells)) {
-      return { winner: ctx.currentPlayer };
-    }
-
-    if (G.cells.filter(unclaimed).length === 0) {
-      return { draw: true };
-    }
-
-    let numMoves = Okiya.ai.enumerate(G, ctx).length;
-
-    if (numMoves === 0) {
-      return {
-        winner: ctx.currentPlayer,
-        stalemate: true,
-      };
-    }
-  },
-};
-
-export default Okiya;
+const appElement = document.getElementById('app');
+const app = new OkiyaClient(appElement);
