@@ -66,8 +66,7 @@ anymore
 
 ## Difference from Original Game
 
-This adaptation uses 4 Card Suites (Hearts, Spades, Clubs, Diamonds) instead of the 4 plants.
-
+This adaptation uses 4 Card Suites (Hearts, Spades, Clubs, Diamonds) and 4 colors.
 
 ## How to run?
 
