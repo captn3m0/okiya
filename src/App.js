@@ -7,32 +7,25 @@ function Tile(val, id=null, ctx=null) {
     let index = parseInt(val[1], 10) - 1;
     return SUITS[index];
   }
-  let text = (val ===0 || val ===1)? "" : suitLookup(val);
+  let text = (val ==="0" || val ==="1")? "" : suitLookup(val);
 
-  return `<td class=cell data-tile=${val} data-suit=${val[1]} key=${id} >${text}</td>`
+  return `<td class=cell data-tile=${val} data-suit=${val[1]} data-id=${id} key=${id} >${text}</td>`
 }
 
 
 class OkiyaClient {
   constructor(rootElement) {
-    this.client = Client({ game: Okiya });
+    this.client = Client({ game: Okiya, numPlayers: 2, });
     this.client.start();
     this.rootElement = rootElement;
-    this.client.subscribe(state => this.update(state));
-    this.createBoard();
-    this.attachListeners();
-  }
 
-
-  createBoard() {
-    this.rootElement.innerHTML = `
-      <table id=board></table>
-      <p class="winner"></p>
-      <div class="lastplayed"></div>`;
+    this.client.subscribe(state => {
+      this.update(state)
+      this.attachListeners();
+    });
   }
 
   update(state) {
-
     let tbody = [];
     for (let i = 0; i < 4; i++) {
       let cells = [];
@@ -40,13 +33,15 @@ class OkiyaClient {
         const id = 4 * i + j;
         cells.push(Tile(state.G.cells[id], id, this));
       }
-      tbody.push(`<tr key=${i}>${cells}</tr>`);
+      tbody.push(`<tr key=${i}>${cells.join("\n")}</tr>`);
     }
 
-    let lastPlayed = "";
+    let lastPlayed = "", winner = "", html = `
+      <table class=board>${tbody.join("\n")}</table>
+      <p class="winner"></p>`;
 
-    if (state.G.lastPlayed)
-      lastPlayed = `<div>
+    if (state.G.lastPlayed && state.ctx.gameover === undefined) {
+      html += `<div>
         <p>Last Played Tile: </p>
         <table class="board">
         <tr>
@@ -54,22 +49,29 @@ class OkiyaClient {
         </tr>
         </table>
         </div>`;
+    }
 
-    this.rootElement.innerHTML = `
-      <table class=board>${tbody.join("\n")}</table>
-      <p class="winner"></p>
-      ${lastPlayed}`;
-    
+    if (state.ctx.gameover) {
+      if (state.ctx.gameover.draw) {
+        html += `div id="winner">Draw!</div>`;
+      } else {
+        html += `<div id="winner">Winner: ${state.ctx.gameover.winner === "0" ? "Red" : "Black"}`;
+        if (state.ctx.gameover.stalemate) {
+          html += "<span> by stalemate</span>";
+        }
+      }
+    }
+
+    this.rootElement.innerHTML = html;
   }
 
 
   attachListeners() {
-    // This event handler will read the cell id from a cell’s
-    // `data-id` attribute and make the `clickCell` move.
     const handleCellClick = event => {
       const id = parseInt(event.target.dataset.id);
       this.client.moves.clickCell(id);
     };
+
     // Attach the event listener to each of the board cells.
     const cells = this.rootElement.querySelectorAll('.cell');
     cells.forEach(cell => {
@@ -77,7 +79,6 @@ class OkiyaClient {
     });
   }
 }
-
 
 const appElement = document.getElementById('app');
 const app = new OkiyaClient(appElement);

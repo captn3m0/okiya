@@ -56,23 +56,28 @@ const UnshuffledDeck = [
   "D4",
 ];
 
-function validMove(cell, id, tile) {
-  const borders = [0, 1, 2, 3, 4, 7, 8, 11, 12, 13, 14, 15];
+const BORDER_TILE_IDS = [0, 1, 2, 3, 4, 7, 8, 11, 12, 13, 14, 15];
+
+// cell is a string identifier from the Deck identifying the Tile (A1-D4)
+// id is the index of the cell in the cells array
+function validMove(cell, id, lastPlayedTile) {
   // If first move, only allow borders
-  if (tile === null) {
-    return borders.includes(id);
+  if (lastPlayedTile === null) {
+    return BORDER_TILE_IDS.includes(id);
   }
   // else match against the last played tile
-  return cell[0] === tile[0] || cell[1] === tile[1];
+  return cell[0] === lastPlayedTile[0] || cell[1] === lastPlayedTile[1];
 }
 
+// Claimed tiles are set to 0 or 1
 function unclaimed(tile) {
   return !(tile === 0 || tile === 1);
 }
 
 export const Okiya = {
+  minPlayers: 2,
+  maxPlayers: 2,
   turn: {
-    moveLimit: 1,
     minMoves: 1,
     maxMoves: 1
   },
@@ -93,14 +98,10 @@ export const Okiya = {
   }),
 
   moves: {
-    clickCell: ({G, playerId}, id) => {
-      console.log(G)
-      console.log(id)
-      console.log(G.cells)
-      console.log(G.cells[id])
+    clickCell({ G, playerID }, id) {
       if (unclaimed(G.cells[id]) && validMove(G.cells[id], id, G.lastPlayed)) {
         G.lastPlayed = G.cells[id];
-        G.cells[id] = playerId;
+        G.cells[id] = playerID;
       } else {
         return INVALID_MOVE;
       }
@@ -109,7 +110,7 @@ export const Okiya = {
 
   endIf: ({G, ctx}) => {
     if (IsVictory(G.cells)) {
-      return { winner: ctx.currentPlayer };
+      return { winner: ctx.currentPlayer, stalemate: false, draw: false };
     }
 
     if (G.cells.filter(unclaimed).length === 0) {
