@@ -19,7 +19,8 @@
     "boardgame.io": "^0.50.2"
   },
   "devDependencies": {
-    "parcel-bundler": "^1.12.5"
+    "parcel": "^2.0.0",
+    "process": "^0.11.10"
   },
   "browserslist": "defaults and supports async-functions"
 }
